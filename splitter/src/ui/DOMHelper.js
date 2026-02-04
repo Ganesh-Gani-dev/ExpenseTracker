@@ -22,4 +22,17 @@ export class DOMHelpers {
     }
     return li;
   }
+   static clearElement(element) {
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+    }
+
+    static appendFragment(parent, items, createItemFn) {
+        const fragment = document.createDocumentFragment();
+        items.forEach(item => {
+            fragment.appendChild(createItemFn(item));
+        });
+        parent.appendChild(fragment);
+    }
 }
