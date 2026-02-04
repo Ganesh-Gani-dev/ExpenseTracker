@@ -1,4 +1,6 @@
 import {DOMHelpers} from './DOMHelper';
+import {showSuccessToast} from "../utils/toastUtil";
+import {showErrorToast} from "../utils/toastUtil"
 
 
 export class ExpenseUI{
@@ -16,7 +18,11 @@ export class ExpenseUI{
         this.elements = {
             addUserForm: DOMHelpers.getElementById("addUserForm"),
             userInput: DOMHelpers.getElementById("userInput"),
-            expenseUserInput: DOMHelpers.getElementById("expenseUserInput")
+            expenseUserInput: DOMHelpers.getElementById("expenseUserInput"),
+            addExpenseForm : DOMHelpers.getElementById("addExpenseForm"),
+            expenseAmountInput : DOMHelpers.getElementById("expenseAmountInput"),
+            expenseReasonInput : DOMHelpers.getElementById("expenseReasonInput"),
+            paymentList: DOMHelpers.getElementById("payment-list")
         }
     }
 
@@ -31,6 +37,12 @@ export class ExpenseUI{
     bindEvents(){
         this.elements.addUserForm.addEventListener("submit",(e)=>{
             this.handleAddUser(e);
+        })
+
+        this.elements.addExpenseForm.addEventListener("submit",(e)=>
+            {
+                this.handleAddExpense(e);
+
         })
     }
 
@@ -47,12 +59,14 @@ export class ExpenseUI{
             this.addUserToSelect(user.name)
 
             this.elements.addUserForm.reset();
+            showSuccessToast(`User ${user.name} got added!`);
             console.log(`User ${user.name} got added!`)
 
         }
         catch(error)
-        {
-          console.error("Error Adding the user",error);
+        { 
+          console.log(error); 
+          showErrorToast("Error Adding the user",error);
         }
     }
 
@@ -61,4 +75,50 @@ export class ExpenseUI{
         const option =DOMHelpers.createOption(userName,userName);
         this.elements.expenseUserInput.add(option)
     }
+
+       async handleAddExpense(e) {
+        e.preventDefault();
+
+        try {
+            const paidBy = this.elements.expenseUserInput.value.trim();
+            const amount = this.elements.expenseAmountInput.valueAsNumber;
+            const description = this.elements.expenseReasonInput.value.trim();
+
+            if (!paidBy) {
+                showErrorToast("Please select a user");
+            }
+
+            if (!amount || amount <= 0) {
+               showErrorToast("Please enter an amount greater than zero");
+            }
+
+            const expense = this.expenseService.addExpense(
+                paidBy,
+                amount,
+                description
+            );
+            this.renderExpense(expense);
+
+            // Reset form
+            this.elements.expenseAmountInput.value = "";
+            this.elements.expenseReasonInput.value = "";
+
+            showSuccessToast(`Expense added by ${paidBy}`);
+            console.log(`Expense added by ${paidBy}:`, expense);
+        } catch (error) {
+            showErrorToast(error.message);
+            console.error("Error adding expense:", error);
+        }
+    }
+
+       renderExpense(expense) {
+        const text =
+            expense.description !== "No description"
+                ? `${expense.paidBy} paid ₹${expense.amount} for ${expense.description}`
+                : `${expense.paidBy} paid ₹${expense.amount}`;
+
+        const listItem = DOMHelpers.createListItem(text, "expense-item");
+        this.elements.paymentList.appendChild(listItem);
+    }
+
 }

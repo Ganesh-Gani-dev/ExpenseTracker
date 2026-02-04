@@ -1,31 +1,34 @@
 import { ExpenseUI } from "./ui/expenseUI";
-import {UserService} from "./services/userService"
-import {ExpenseService} from "./services/expenseService"
+import { UserService } from "./services/userService";
+import { ExpenseService } from "./services/expenseService";
 
 class ExpenseApp {
-   constructor ()
-   {
+  constructor() {
     this.userService = new UserService();
     this.expenseService = new ExpenseService(this.userService);
     this.ui = null;
-   } 
+  }
 
-   init()
-   {
-    try{
-        this.ui = new ExpenseUI(this.userService,this.expenseService);
-        console.log("Splitter App initialized successfully")
+  init() {
+    try {
+      this.ui = new ExpenseUI(this.userService, this.expenseService);
+      console.log("Splitter App initialized successfully");
+    } catch (error) {
+      console.log("Error initializing the App!");
     }
-    catch(error){
-     console.log("Error initializing the App!");
-     
-    }
-   }
+  }
 }
 
 let expenseApp;
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", () => {
+  expenseApp = new ExpenseApp();
+  expenseApp.init();
+});
+
+window.addEventListener("load", () => {
+  if (!expenseApp) {
     expenseApp = new ExpenseApp();
     expenseApp.init();
-})
+  }
+});
