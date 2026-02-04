@@ -9,14 +9,20 @@ export class ExpenseUI{
 
         this.initializeElements();
         this.bindEvents();
-        //this.initializeSelectBox();
+        this.initializeSelectBox();
     }
     initializeElements()
     {
         this.elements = {
             addUserForm: DOMHelpers.getElementById("addUserForm"),
-            userInput: DOMHelpers.getElementById("userInput")
+            userInput: DOMHelpers.getElementById("userInput"),
+            expenseUserInput: DOMHelpers.getElementById("expenseUserInput")
         }
+    }
+
+    initializeSelectBox()
+    {   const defaultOption =DOMHelpers.createOption("Select User","");
+        this.elements.expenseUserInput.add(defaultOption);
     }
 
 
@@ -38,6 +44,7 @@ export class ExpenseUI{
                 throw new Error ("User name is mandatory")
             }
             const user = this.userService.addUser(name);
+            this.addUserToSelect(user.name)
 
             this.elements.addUserForm.reset();
             console.log(`User ${user.name} got added!`)
@@ -47,5 +54,11 @@ export class ExpenseUI{
         {
           console.error("Error Adding the user",error);
         }
+    }
+
+    addUserToSelect(userName)
+    {
+        const option =DOMHelpers.createOption(userName,userName);
+        this.elements.expenseUserInput.add(option)
     }
 }
