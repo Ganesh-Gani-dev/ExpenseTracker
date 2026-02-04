@@ -7,14 +7,16 @@ export class UserService {
 
   addUser(name) {
     if (!name) {
-      console.warn("User name required");
+      throw new Error("User name is required");
     }
+
     const trimmedName = name.trim();
-    if ((this.users, has(trimmedName))) {
-      throw new Error("User Already exists!");
+    if (this.users.has(trimmedName)) {
+      throw new Error("User already exists");
     }
-    const user = new User(name);
-    this.users.set(name, user);
+
+    const user = new User(trimmedName);
+    this.users.set(trimmedName, user);
     return user;
   }
 
@@ -26,7 +28,19 @@ export class UserService {
     return Array.from(this.users.values());
   }
 
+  getUserNames() {
+    return Array.from(this.users.keys());
+  }
+
   hasUser(name) {
     return this.users.has(name);
+  }
+
+  getUserCount() {
+    return this.users.size;
+  }
+
+  clear() {
+    this.users.clear();
   }
 }
